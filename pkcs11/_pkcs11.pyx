@@ -1076,13 +1076,13 @@ class UnwrapMixin(types.UnwrapMixin):
             Attribute.LABEL: label or '',
             Attribute.TOKEN: store,
             # Capabilities
-            Attribute.ENCRYPT: MechanismFlag.ENCRYPT & capabilities,
-            Attribute.DECRYPT: MechanismFlag.DECRYPT & capabilities,
-            Attribute.WRAP: MechanismFlag.WRAP & capabilities,
-            Attribute.UNWRAP: MechanismFlag.UNWRAP & capabilities,
-            Attribute.SIGN: MechanismFlag.SIGN & capabilities,
-            Attribute.VERIFY: MechanismFlag.VERIFY & capabilities,
-            Attribute.DERIVE: MechanismFlag.DERIVE & capabilities,
+            #Attribute.ENCRYPT: MechanismFlag.ENCRYPT & capabilities,
+            #Attribute.DECRYPT: MechanismFlag.DECRYPT & capabilities,
+            #Attribute.WRAP: MechanismFlag.WRAP & capabilities,
+            #Attribute.UNWRAP: MechanismFlag.UNWRAP & capabilities,
+            #Attribute.SIGN: MechanismFlag.SIGN & capabilities,
+            #Attribute.VERIFY: MechanismFlag.VERIFY & capabilities,
+            #Attribute.DERIVE: MechanismFlag.DERIVE & capabilities,
         }
         attrs = AttributeList(merge_templates(template_, template))
 

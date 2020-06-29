@@ -108,6 +108,7 @@ cdef class MechanismWithParam:
         cdef CK_RSA_PKCS_OAEP_PARAMS *oaep_params
         cdef CK_RSA_PKCS_PSS_PARAMS *pss_params
         cdef CK_ECDH1_DERIVE_PARAMS *ecdh1_params
+        cdef CK_ULONG               *mac_bytes
 
         # Unpack mechanism parameters
         if mechanism is Mechanism.RSA_PKCS_OAEP:
@@ -162,6 +163,17 @@ cdef class MechanismWithParam:
             ecdh1_params.pPublicData = public_data
             ecdh1_params.ulPublicDataLen = <CK_ULONG> len(public_data)
 
+        elif mechanism in (Mechanism.AES_CMAC, Mechanism.DES3_CMAC):
+            paramlen = sizeof(CK_ULONG)
+
+            self.param = mac_bytes = \
+                <CK_ULONG *> PyMem_Malloc(paramlen)
+
+            if mechanism == Mechanism.AES_CMAC:
+                mac_bytes[0] = 16
+            else:
+                mac_bytes[0] = 8
+        
         elif isinstance(param, bytes):
             self.data.pParameter = <CK_BYTE *> param
             paramlen = len(param)

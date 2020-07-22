@@ -164,15 +164,20 @@ cdef class MechanismWithParam:
             ecdh1_params.ulPublicDataLen = <CK_ULONG> len(public_data)
 
         elif mechanism in (Mechanism.AES_CMAC, Mechanism.DES3_CMAC):
-            paramlen = sizeof(CK_ULONG)
+            if isinstance(param, int):
+                paramlen = sizeof(CK_ULONG)
 
-            self.param = mac_bytes = \
-                <CK_ULONG *> PyMem_Malloc(paramlen)
+                self.param = mac_bytes = \
+                    <CK_ULONG *> PyMem_Malloc(paramlen)
 
-            if mechanism == Mechanism.AES_CMAC:
-                mac_bytes[0] = 16
+                if mechanism == Mechanism.AES_CMAC:
+                    mac_bytes[0] = param
+                else:
+                    mac_bytes[0] = param
             else:
-                mac_bytes[0] = 8
+                self.data.pParameter = NULL
+
+                paramlen = 0
         
         elif isinstance(param, bytes):
             self.data.pParameter = <CK_BYTE *> param

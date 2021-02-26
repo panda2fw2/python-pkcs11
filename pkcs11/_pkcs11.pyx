@@ -146,7 +146,7 @@ cdef class MechanismWithParam:
 
             (pss_params.hashAlg, pss_params.mgf, pss_params.sLen) = param
 
-        elif mechanism is Mechanism.ECDH1_DERIVE:
+        elif mechanism in (Mechanism.ECDH1_DERIVE, Mechanism.ECDH1_COFACTOR_DERIVE):
             paramlen = sizeof(CK_ECDH1_DERIVE_PARAMS)
             self.param = ecdh1_params = \
                 <CK_ECDH1_DERIVE_PARAMS *> PyMem_Malloc(paramlen)
@@ -1127,7 +1127,7 @@ class DeriveMixin(types.DeriveMixin):
         if not isinstance(key_type, KeyType):
             raise ArgumentsBad("`key_type` must be KeyType.")
 
-        if not isinstance(key_length, int):
+        if key_length is not None and not isinstance(key_length, int):
             raise ArgumentsBad("`key_length` is the length in bits.")
 
         if capabilities is None:
@@ -1148,7 +1148,7 @@ class DeriveMixin(types.DeriveMixin):
             Attribute.ID: id or b'',
             Attribute.LABEL: label or '',
             Attribute.TOKEN: store,
-            Attribute.VALUE_LEN: key_length // 8,  # In bytes
+            #Attribute.VALUE_LEN: key_length // 8,  # In bytes
             Attribute.PRIVATE: True,
             Attribute.SENSITIVE: True,
             # Capabilities
@@ -1160,6 +1160,13 @@ class DeriveMixin(types.DeriveMixin):
             Attribute.VERIFY: MechanismFlag.VERIFY & capabilities,
             Attribute.DERIVE: MechanismFlag.DERIVE & capabilities,
         }
+
+        if key_type is KeyType.AES:
+            if key_length is None:
+                raise ArgumentsBad("Must provide `key_length'")
+
+            template_[Attribute.VALUE_LEN] = key_length // 8  # In bytes
+
         attrs = AttributeList(merge_templates(template_, template))
 
         cdef CK_OBJECT_HANDLE key
